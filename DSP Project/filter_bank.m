@@ -1,14 +1,21 @@
 function opAudio = filter_bank()
     % Read audio file
     % Read the shared audio file
-    [audio, Fs] = audioread('/MATLAB Drive/Repositories/MPEG-converter/DSP Project/egaudio.wav');
+    [audio, Fs] = audioread('/egaudio.wav');
 
     % Construct filter coefficients matrix using the shared "filters.txt"
-    filter_coefficients = dlmread('/MATLAB Drive/Repositories/MPEG-converter/DSP Project/filters.txt');
+    filter_coefficients = dlmread('/MPEG-converter/DSP Project/filters.txt');
     impulse_response = zeros(1, 512);
-    impulse_response(1) = 1;
-    filter_bank = zeros(32, 512);
+    % Construct impulse response matrix from equation h_k[n] = h[n] * cos((k+0.5)(n-15)pi/32)
     for i = 1:32
-        filter_bank(i, :) = filter(filter_coefficients(i, :), 1, impulse_response);
+        impulse_response = impulse_response + filter_coefficients(i, :) .* cos((i-1+0.5) .* (0:511-15) .* pi ./ 32);
     end
+    plot(impulse_response);
+    % Apply filter to audio
+    opAudio = zeros(1, 512);
+    for i = 1:512
+        opAudio(i) = sum(audio(i:i+511) .* impulse_response);
+    end
+    % Write audio to file
+    audiowrite('/MATLAB Drive/Repositories/MPEG-converter/DSP Project/egaudio_op.wav', opAudio, Fs);
 end
