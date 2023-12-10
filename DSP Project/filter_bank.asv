@@ -1,4 +1,4 @@
-function [opAudio,Fs1] = filter_bank()
+function opAudio = filter_bank()
     % Read audio file
     % Read the shared audio file
     [y, Fs] = audioread('/egaudio.wav');
@@ -15,5 +15,4 @@ function [opAudio,Fs1] = filter_bank()
     for k = 1:32
         opAudio(:, k) = filter(h_k(k, :), 1, y);
     end
-    
 end
